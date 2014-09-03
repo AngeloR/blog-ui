@@ -1,3 +1,4 @@
+var Today = new Date();
 // This is what you call a "hack". Basically, github in all its programming 
 // wisdom has decided that the best way to inject content into your website is 
 // via document.write. Which severely futzes up any kind of dynamic browser-side 
@@ -194,6 +195,8 @@ function App(env) {
     }
 
     function constructor() {
+
+        $('#copyright-year').html(Today.getFullYear());
         
         $('#yearnav').on('click', '.article-link', function(e) {
             var $this = $(this),
