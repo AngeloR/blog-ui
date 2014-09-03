@@ -99,7 +99,7 @@ h4 {
 #yearnav a:hover, #yearnav a.current {
     display: block;
 }
-#content {
+#main {
     float: left;
     width: 40%;
 }
@@ -170,6 +170,9 @@ footer .social-media-account {
 }
 #content .gist a {
     background: none;
+}
+#post-footer {
+    margin-top: 50px;
 }
 .clearfix {
     clear: both;
