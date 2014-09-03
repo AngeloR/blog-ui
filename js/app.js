@@ -1,3 +1,4 @@
+var Today = new Date();
 // This is what you call a "hack". Basically, github in all its programming 
 // wisdom has decided that the best way to inject content into your website is 
 // via document.write. Which severely futzes up any kind of dynamic browser-side 
@@ -39,14 +40,15 @@ function App(env) {
         return self.baseURL + '#!' + str;
     };
 
-    function loadArticle(path) {
-        path = path.split('#!/')[1];
+    function loadArticle(origPath) {
+        var path = origPath.split('#!/')[1];
         path = path.split('/');
 
         self.client.getArticle(path[0], path[1], path[2], function(article){
+            $('body').animate({scrollTop: 0}, 'slow');
             var $content = $('#content');
             $content.html(article);
-            $('body').animate({scrollTop: 0}, 'slow');
+            loadDisqusComments(article.slug, article.name, origPath);
         });
     }
 
@@ -73,7 +75,7 @@ function App(env) {
                     // write out the articles
                     $.each(articles[month], function(i2, article){
                         date = new Date(article.pubdate);
-                        data.push('<li><a href="'+url(date.getFullYear(), date.getMonth(), article.slug)+'" class="article-link">' + article.name +'</a></li>');
+                        data.push('<li><a href="'+url(date.getFullYear(), date.getMonth(), article.slug)+'" class="article-link" data-disqus-identifier="'+article.slug+'">' + article.name +'</a></li>');
                     });
                 }
             });
@@ -85,13 +87,30 @@ function App(env) {
         });
     }
 
+    function loadDisqusComments(slug, title, url) {
+        try {
+            DISQUS.reset({
+                reload: true,
+                config: function() {
+                    this.page.identifier = slug;
+                    this.page.url = url;
+                }
+            });
+        }
+        catch(e) {
+            setTimeout(function() {
+                loadDisqusComments(slug, title, url);
+            }, 250);
+        }
+    }
+
     function setDefaultDoc() {
         var hash = window.location.hash,
             d = new Date();
 
         loadArticlesForYear(d.getFullYear(), function(){
             // lets set the color of the links on the sidebar
-            colors = gradientTween([toDec('ff'), toDec('9c'), toDec('4a')], [toDec('8c'), toDec('00'), toDec('7b')], $('#yearnav .article-link').length);
+            colors = gradientTween([255, toDec('9c'), toDec('4a')], [toDec('8c'), 0, toDec('7b')], $('#yearnav .article-link').length);
 
             $('#yearnav .article-link').each(function(i, el) {
                 var $el = $(el);
@@ -176,6 +195,8 @@ function App(env) {
     }
 
     function constructor() {
+
+        $('#copyright-year').html(Today.getFullYear());
         
         $('#yearnav').on('click', '.article-link', function(e) {
             var $this = $(this),
