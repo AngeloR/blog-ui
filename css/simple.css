@@ -102,6 +102,7 @@ h4 {
 #main {
     float: left;
     width: 40%;
+    margin-left: 3%;
 }
 footer {
     position: fixed;
